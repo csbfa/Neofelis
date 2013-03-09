@@ -1,9 +1,15 @@
 
-import sys, getopt, re, os, socket, signal, logging
-from Library import Ping, Exceptions, Utils, Log
-from Library.Progress import TerminalController
-from Application.View import *
-from Application.Pipeline import *
+from Library import Ping, Exceptions, Utils, Log, Progress
+from Application import Pipeline, View
+import sys
+import getopt
+import re
+import os
+import socket
+import signal
+import logging
+import pickle
+
 
 class Neofelis():
     """
@@ -308,7 +314,7 @@ class Neofelis():
                 k = re.sub('^-{1,2}', '', k )
                 k = re.sub('=', '', k)
 
-                short = ShortOptions(self, k)
+                short = Utils.ShortOptions(self, k)
 
                 if k in self._params:
 
@@ -371,7 +377,7 @@ class Neofelis():
                     "Foundation; with no Invariant Sections, with no Front-Cover Texts,\nand with no Back-Cover Texts." \
                     "\n\nInitializing program..."
 
-            term = TerminalController()
+            term = Progress.TerminalController()
             header = term.render(TITLE % title)
             content = term.render(BODY % body)
             sys.stdout.write(header)
@@ -392,7 +398,7 @@ class Neofelis():
             # check if screen is capable of GUI
             try:
                 # call GUI and ignore rest of input, except server
-                self._view = NeofelisView("GUI")
+                self._view = View.NeofelisView("GUI")
 
                 # If server is specified, attempt to connect to the server ( given ip or hla ).
                 # If no connection could be made, start a new server at that address
@@ -409,7 +415,7 @@ class Neofelis():
 
         else:
 
-            self._view = NeofelisView("console")
+            self._view = View.NeofelisView("console")
 
             if self._params["input_file"] is not None and self._params["input_dir"] is not None:
                 print("Invalid input: Cannot specify input file and input directory together")
@@ -466,13 +472,13 @@ class Neofelis():
                 return -1
 
             if self._params["input_file"]:
-                self._params["input_file"] = FileIO(self, input_file = self._params["input_file"])
+                self._params["input_file"] = Utils.FileIO(self, input_file = self._params["input_file"])
 
             if self._params["input_dir"]:
-                self._params["input_dir"] = FileIO(self, input_dir = self._params["input_dir"])
+                self._params["input_dir"] = Utils.FileIO(self, input_dir = self._params["input_dir"])
 
             if self._params["output"]:
-                self._params["output"] = FileIO(self, output_dir= self._params["output"])
+                self._params["output"] = Utils.FileIO(self, output_dir= self._params["output"])
             else:
                 print("no report output was provided")
                 return -1
@@ -481,7 +487,7 @@ class Neofelis():
                 #Save(self, self._params)
 
             # set up for multiprocessing
-            self.pipe = NeofelisPipeline()
+            self.pipe = Pipeline.NeofelisPipeline()
             self.pipe.run(self._params)
 
             logging.shutdown()
