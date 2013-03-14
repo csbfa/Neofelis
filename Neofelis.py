@@ -1,14 +1,12 @@
 
-from Library import Ping, Exceptions, Utils, Log, Progress
-from Application import Pipeline, View
-import sys
-import getopt
-import re
-import os
-import socket
-import signal
-import logging
-import pickle
+import sys, getopt, re, os, socket, signal, logging, pickle
+import com.pipeline.Pipeline as Pipeline
+import com.view.View as View
+import com.server.Ping as Ping
+import com.exceptions as Exceptions
+import com.utils.Utils as Utils
+import com.log.Log as Log
+import com.post.Progress as Progress
 
 
 class Neofelis():
@@ -352,21 +350,6 @@ class Neofelis():
             print(Neofelis.usage)
             return -1
 
-        #print("\nNOTES:\n\nTODO: BLAST+, .00 suffix and validation check when the suffix is present")
-        #print("TODO: propagate pipeline thread instance among all sub classes for termination check")
-        #print("TODO: Prompt, parse, and save")
-        #print("TODO: overwrite lines rather than append to STDOUT")
-        #print("TODO: over reporting number of failed files")
-        #print("TODO: overwrite xml files if empty")
-        #print("TODO: ignore non fasta files in inital processing")
-        #print("TODO: check cores")
-        #print("TODO: better way to terminate program inside methods")
-
-        print("TODO: check logging")
-        print("TODO: error msg # enum")
-        print("TODO: pass exception msg to parent")
-        print("TODO: thread safety for logging")
-
         if not self._params["qsub"]:
             TITLE = '\n\n${BOLD}${BLACK}%s${NORMAL}\n\n'
             BODY = '${NORMAL}${BLACK}%s${NORMAL}\n\n'
@@ -384,13 +367,14 @@ class Neofelis():
             sys.stdout.write(content)
 
         # start logging
-        #try:
-            #Log().start(self.LEVELS.get(str(self._params("log")).lower(), logging.ERROR))
-        #except Exceptions.LoggingError:
-            #return -1
+        try:
+            self._log = Log()
+            self._log.start(self.LEVELS.get(str(self._params("log")).lower(), logging.ERROR))
+        except Exceptions.LoggingException:
+            return -1
 
-        #self._logger = Log.new(__name__)
-        #self._logger.info("Logging started with level %s", str(self._params("log")).upper())
+        self._logger = self._log.new(__name__)
+        self._logger.info("Logging started with level %s", str(self._params("log")).upper())
 
         # different than default action - input parameters AND GUI allowed
         if re.match(r'gui', self._params["interface"], re.IGNORECASE):
@@ -498,5 +482,20 @@ class Neofelis():
 
 # main catch
 if __name__ == "__main__":
+    
+            #print("\nNOTES:\n\nTODO: BLAST+, .00 suffix and validation check when the suffix is present")
+        #print("TODO: propagate pipeline thread instance among all sub classes for termination check")
+        #print("TODO: Prompt, parse, and save")
+        #print("TODO: overwrite lines rather than append to STDOUT")
+        #print("TODO: over reporting number of failed files")
+        #print("TODO: overwrite xml files if empty")
+        #print("TODO: ignore non fasta files in inital processing")
+        #print("TODO: check cores")
+        #print("TODO: better way to terminate program inside methods")
+
+        #print("TODO: check logging")
+        #print("TODO: error msg # enum")
+        #print("TODO: pass exception msg to parent")
+        #print("TODO: thread safety for logging")
 
     sys.exit(Neofelis().main(sys.argv))
