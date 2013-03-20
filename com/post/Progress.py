@@ -30,14 +30,14 @@ class ProgressBar:
 		self.header = self.term.render(self.HEADER % self.header)
 		self.cleared = 1  # : true if we haven't drawn the bar yet.
 
-	def post(self, hours, minutes, seconds, completed, failed):
+	def __print__(self, hours, minutes, seconds, completed, failed):
 		if self.cleared:
 			sys.stdout.write(str(self.term.BOL, 'ascii') + str(self.term.CLEAR_EOL, 'ascii') + self.header % 
 							  (self.quantities, hours, minutes, seconds, completed, failed) + str(self.term.CLEAR_EOL, 'ascii'))
 			self.cleared = 0
 			sys.stdout.write("\n\n")
 
-	def update(self, percent, message):
+	def __update__(self, percent, message):
 		self.percent = float(percent) * 0.1
 		n = int((self.width - 10) * self.percent)
 		sys.stdout.write(str(self.term.BOL, 'ascii') + str(self.term.CLEAR_EOL, 'ascii') + message + "\n" + 
@@ -45,7 +45,7 @@ class ProgressBar:
 		self.cleared = 0
 		sys.stdout.write("\n\n")
 
-	def clear(self):
+	def __clear__(self):
 		if not self.cleared:
 			sys.stdout.buffer.write(self.term.BOL)
 			sys.stdout.buffer.write(self.term.CLEAR_EOL)
@@ -143,15 +143,18 @@ class TerminalController:
 
 		# Curses isn't available on all platforms
 		try: import curses
-		except: return
-
+		except Exception as e: 
+			raise e
+		
 		# If the stream isn't a tty, then assume it has no capabilities.
-		if not term_stream.isatty(): return
+		if not term_stream.isatty(): 		
+				raise Exception
 
 		# Check the terminal type.  If we fail, then assume that the
 		# terminal has no capabilities.
 		try: curses.setupterm()
-		except: return
+		except Exception as e: 
+			raise e
 
 		# Look up numeric capabilities.
 		self.COLS = curses.tigetnum('cols')
