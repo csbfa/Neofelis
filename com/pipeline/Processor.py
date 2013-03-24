@@ -3,6 +3,11 @@ import Library.Event as event
 from Library.Exceptions import *
 from Library.Utils import loadGenome
 from Library import Artemis, Extend, Genemark, Intergenic, Promoters, Report, tRNA, Scaffolds, Signals, Terminators
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Processor")
 
 class Processor(event.Event, threading.Thread):
     """
@@ -10,6 +15,7 @@ class Processor(event.Event, threading.Thread):
     """
 
     def __init__(self, query, params, lock):
+        self._logger.info("Method call: Processor.__init__")
 
         event.Event.__init__(self)
         threading.Thread.__init__(self)
@@ -45,6 +51,7 @@ class Processor(event.Event, threading.Thread):
         self._report = Report.Report()
 
     def stop(self):
+        self._logger.info("Method call: stop")
         """
 
         """
@@ -52,6 +59,7 @@ class Processor(event.Event, threading.Thread):
         self._panic.set()
 
     def stopped(self):
+        self._logger.info("Method call: stopped")
         """
 
         """
@@ -59,6 +67,7 @@ class Processor(event.Event, threading.Thread):
         return self._panic.isSet()
 
     def run(self):
+        self._logger.info("Method call: run")
         """
 
         """
@@ -85,7 +94,7 @@ class Processor(event.Event, threading.Thread):
             self._initialGenes = self._genemark.findGenes(self._swapFileName, self._filename, self._blastLocation,
                     self._database, self._eValue, self._genemarkLocation, self._matrix, self._output, self)
         except GenemarkError:
-            print("pipeline ", self._name, " failed. Terminating thread at line ", 420 )
+            self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
             self.fire(self, message="failed")
             self.stop()
         finally:
@@ -98,7 +107,7 @@ class Processor(event.Event, threading.Thread):
             self._extendedGenes = self._extend.extendGenes(self._swapFileName, self._initialGenes, self._filename,
                     self._blastLocation, self._database, self._eValue, self._output, self)
         except ExtendError:
-            print("pipeline ", self._name, " failed. Terminating thread at line ", 433 )
+            self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
             self.fire(self, message="failed")
             self.stop()
         finally:
@@ -111,7 +120,7 @@ class Processor(event.Event, threading.Thread):
             self._intergenicGenes = self._intergenic.findIntergenics(self._swapFileName, self._extendedGenes,
                     self._filename, self._minLength, self._blastLocation, self._database, self._eValue, self._output, self)
         except IntergenicError:
-            print("pipeline ", self._name, " failed. Terminating thread at line ", 446 )
+            self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
             self.fire(self, message="failed")
             self.stop()
         finally:
@@ -132,7 +141,7 @@ class Processor(event.Event, threading.Thread):
         try:
             self._scaffolded = self._scaffolds.refineScaffolds(self._genes, self._scaffoldingDistance, self)
         except ScaffoldsError:
-            print("pipeline ", self._name, " failed. Terminating thread at line ", 466 )
+            self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
             self.fire(self, message="failed")
             self.stop()
         finally:
@@ -145,7 +154,7 @@ class Processor(event.Event, threading.Thread):
             self._initialPromoters = self._promoters.findPromoters(self._swapFileName, self._filename,
                 self._promoterScoreCutoff, self._output, self)
         except PromotersError:
-            print("pipeline ", self._name, " failed. Terminating thread at line ", 479 )
+            self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
             self.fire(self, message="failed")
             self.stop()
         finally:
@@ -159,7 +168,7 @@ class Processor(event.Event, threading.Thread):
             self._initialTerminators = self._terminators.findTerminators(self._swapFileName, self._filename,
                     self._genes.values(), self._transtermLocation, self)
         except TerminatorsError:
-            print("pipeline ", self._name, " failed. Terminating thread at line ", 492 )
+            self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
             self.fire(self, message="failed")
             self.stop()
         finally:
@@ -173,7 +182,7 @@ class Processor(event.Event, threading.Thread):
             try:
                 self._filteredSignals = self._signals.filterSignals(self._scaffolded.values(), self._initialTerminators + self._initialPromoters, self)
             except SignalsError:
-                print("pipeline ", self._name, " failed. Terminating thread at line ", 507 )
+                self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
                 self.fire(self, message="failed")
                 self.stop()
             finally:
@@ -186,11 +195,11 @@ class Processor(event.Event, threading.Thread):
                 self._filteredPromoters = list(filter(lambda x: isinstance(x, self._promoters.Promoter), self._filteredSignals))
                 self._filteredTerminators = list(filter(lambda x: isinstance(x, self._terminators.Terminator), self._filteredSignals))
             except PromotersError:
-                print("pipeline ", self._name, " failed. Terminating thread at line ", 520 )
+                self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
                 self.fire(self, message="failed")
                 return
             except TerminatorsError:
-                print("pipeline ", self._name, " failed. Terminating thread at line ", 525 )
+                self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
                 self.fire(self, message="failed")
                 self.stop()
             finally:
@@ -202,7 +211,7 @@ class Processor(event.Event, threading.Thread):
             try:
                 self._transferRNAs = self._trna.findtRNAs(self._tRNAscanLocation, self._swapFileName, self._name, self)
             except RNAError:
-                print("pipeline ", self._name, " failed. Terminating thread at line ", 536 )
+                self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
                 self.fire(self, message="failed")
                 self.stop()
             finally:
@@ -216,7 +225,7 @@ class Processor(event.Event, threading.Thread):
                 self._artemis.writeArtemisFile(self._output + "/" + self._name + ".art", self._genome, self,
                         self._scaffolded.values(), self._filteredPromoters, self._filteredTerminators, self._transferRNAs)
             except ArtemisError:
-                print("pipeline ", self._name, " failed. Terminating thread at line ", 550 )
+                self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
                 self.fire(self, message="failed")
                 self.stop()
             finally:
@@ -228,7 +237,7 @@ class Processor(event.Event, threading.Thread):
             try:
                 self._report.report(self._filename, self._scaffolded, self._output, self)
             except ReportError:
-                print("pipeline ", self._name, " failed. Terminating thread at line ", 562 )
+                self._logger.exception("pipeline " + self._name + " failed. Terminating thread.")
                 self.fire(self, message="failed")
                 self.stop()
             finally:

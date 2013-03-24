@@ -2,6 +2,10 @@ import multiprocessing, time, sys, math
 from threading import RLock, ThreadError
 import Library.Processor as processor
 from Library.Progress import *
+import com.log.Log as Log
+
+self._logger = Log.new()
+self._logger.info("Logging started for Monitor")
 
 class Monitor(multiprocessing.Process):
     """
@@ -9,6 +13,7 @@ class Monitor(multiprocessing.Process):
     """
 
     def __init__(self, manager, event, queries, params):
+        self._logger.info("Method call: Monitor.__init__")
 
         super().__init__()
 
@@ -33,9 +38,11 @@ class Monitor(multiprocessing.Process):
             self.progress = ProgressBar(TerminalController(), len(queries))
             self._simple = 0
         except ValueError:
+            self._logger.warning("Could not start a Terminal Controller, using simple output")
             self._simple = 1
 
     def wait(self):
+        self._logger.info("Method call: wait")
         """
 
         """
@@ -64,6 +71,7 @@ class Monitor(multiprocessing.Process):
             sys.stdout.flush()
 
     def print_simple(self, totalQueries, hours, minutes, seconds):
+        self._logger.info("Method call: print_simple")
         """
 
         """
@@ -76,6 +84,7 @@ class Monitor(multiprocessing.Process):
             self._manager.getFailed(), end="\n")
 
     def run(self):
+        self._logger.info("Method call: run")
         """
 
         """
@@ -88,7 +97,7 @@ class Monitor(multiprocessing.Process):
         try:
             self._thread.start()
         except ThreadError:
-            print("Thread processing error: Unable to start thread.\n at Pipeline.py, at run() line 236")
+            self._logger.exception("Thread processing error: Unable to start thread.\n at Pipeline.py")
             return -1
 
         while self._manager.is_active():
@@ -115,7 +124,7 @@ class Monitor(multiprocessing.Process):
                 try:
                     self._thread.start()
                 except ThreadError:
-                    print("Thread processing error: Unable to start thread.\n at Pipeline.py, at run() line 236")
+                    self._logger.exception("Thread processing error: Unable to start thread.\n at Pipeline.py")
 
             for thread in self._manager.pool():
 
@@ -148,7 +157,7 @@ class Monitor(multiprocessing.Process):
         try:
             self._event.notify()
         except ThreadError:
-            print("Thread Error. Unable to join sentinel thread\n\tat NeofelisPipline.finish()\n\t\tat self._sentinel.join(), line 107")
+            self._logger.exception("Thread Error. Unable to join sentinel thread\n\tat NeofelisPipline.finish()\n\t\tat self._sentinel.join()")
             sys.exit(2)
 
 # __Monitor__

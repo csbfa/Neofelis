@@ -3,10 +3,15 @@ This module contains functions for writing artemis files.
 """
 
 import os
+import com.log.Log as Log
+
+self._logger = Log.new()
+self._logger.info("Logging started for Artemis")
 
 class Artemis():
 
     def writePromoters(self, output, promoters):
+        self._logger.info("Method call: writePromoters")
         """
         output: File object to write to.
         promoters: List of Promoter objects.
@@ -29,6 +34,7 @@ class Artemis():
             output.write("                            /colour=255 0 255\n")
 
     def writeTerminators(self, output, terminators):
+        self._logger.info("Method call: writeTerminators")
         """
         output:      File object to write to.
         terminators: List of Terminator objects.
@@ -44,6 +50,7 @@ class Artemis():
             output.write("                            /note=\"confidence:" + str(terminator.confidence) + "\thp_score:" + str(terminator.hpScore) + "\ttail_score:" + str(terminator.tailScore) + "\"\n")
 
     def writeTransferRNAs(self, output, transferRNAs):
+        self._logger.info("Method call: writeTransferRNAs")
         """
         output:       File object to write to.
         transferRNAs: List of TransferRNA objects.
@@ -59,6 +66,7 @@ class Artemis():
             output.write("                            /note=\"type:" + str(transferRNA.type) + "\tanti codon:" + str(transferRNA.antiCodon) + "\tcove_score:" + str(transferRNA.coveScore) + "\"\n")
 
     def writeGenes(self, output, genes):
+        self._logger.info("Method call: writeGenes")
         """
         output: File object to write to.
         genes:  List of Iteration objects.
@@ -76,6 +84,7 @@ class Artemis():
             output.write("                            /colour=" + gene.color + "\n")
 
     def writeGenome(self, output, genome):
+        self._logger.info("Method call: writeGenome")
         """
         output: File object to write to.
         genome: Genome as a string.
@@ -88,6 +97,7 @@ class Artemis():
             output.write(genome[i:min(i+50, len(genome))] + "\n")
 
     def writeArtemisFile(self, fileName, genome, pipeline, genes=[], promoters=[], terminators=[], transferRNAs=[]):
+        self._logger.info("Method call: writeArtemisFile")
         """
         fileName:     Name of the artemis file to write.
         genome:       Genome as a string.

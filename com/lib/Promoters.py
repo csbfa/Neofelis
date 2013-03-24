@@ -7,10 +7,16 @@ import re
 from urllib import request, parse
 import functools
 import os.path
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Promoters")
 
 class Promoters():
 
     def __init__(self, path):
+        self._logger.info("Method call: Promoters.__init__")
         if not os.path.isdir(path + "/promoterPredictions"):
             os.mkdir(path + "/promoterPredictions")
 
@@ -20,6 +26,7 @@ class Promoters():
         """
 
         def __init__(self):
+            self._logger.info("Method call: Promoter.__init__")
             self.score = 0
             self.position = None
             self.location = None
@@ -27,6 +34,7 @@ class Promoters():
             self.signal35Location = None
 
         def __str__(self):
+            self._logger.info("Method call: Promoter.__str__")
             result = "<"
             result += "Score = " + str(self.score) + ", "
             result += "Position = " + str(self.position) + ", "
@@ -36,6 +44,7 @@ class Promoters():
             return result
 
     def parseBPROM(self, bpromData):
+        self._logger.info("Method call: parseBPROM")
         """
         bpromData: Contents of the body of a BPROM prediction.
   
@@ -47,6 +56,7 @@ class Promoters():
         thirtyFiveBoxes = re.findall(r"\s+-35\s+box\s+at\s+pos.\s+(\d+)\s+([ACGT]+)\s+Score\s+-?\d+", bpromData)
 
         def parsePromoter(self, promoter, tenBox, thirtyFiveBox):
+            self._logger.info("Method call: parsePromoter")
             result = self.Promoter()
             result.score = float(promoter[1])
             result.position = int(promoter[0])
@@ -58,6 +68,7 @@ class Promoters():
         return list(map(parsePromoter, promoters, tenBoxes, thirtyFiveBoxes))
 
     def cachedBPROM(self, genome, fileName):
+        self._logger.info("Method call: cachedBPROM")
         """
         genome: Genome as a string.
         fileName: File to save the BPROM results in.
@@ -73,6 +84,7 @@ class Promoters():
         direction = "forward" if offset == 50 else "reverse"
 
         def getPromoters(self):
+            self._logger.info("Method call: getPromoters")
             input = open(fileName, "r")
             results = self.parseBPROM(input.read())
             input.close()
@@ -106,6 +118,7 @@ class Promoters():
 
 
     def reverseCoordinates(self, genomeLength, promoter):
+        self._logger.info("Method call: reverseCoordinates")
         """
         genomeLength: Length of the genome.
         promoter: Promoter object.
@@ -123,6 +136,7 @@ class Promoters():
         return newPromoter
 
     def findPromoters(self, query, name, scoreCutoff, result_path, pipeline):
+        self._logger.info("Method call: findPromoters")
         """
         query: Name of the query file.
         name: Name of the genome.

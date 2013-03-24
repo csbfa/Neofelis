@@ -7,15 +7,22 @@ import os
 import re
 import functools
 from Library import Utils, Exceptions
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Extend")
 
 class Extend():
 
     def __init__(self, path):
+        self._logger.info("Method call: Extend.__init__")
         if not os.path.isdir(path + "/extendedBlasts"):
             os.mkdir(path + "/extendedBlasts")
         self.path = path + "/extendedBlasts"
   
     def getStops(self, genes):
+        self._logger.info("Method call: getStops")
         """
         genes:  A list of Iteration objects.
 
@@ -36,6 +43,7 @@ class Extend():
         return forwardStops, reverseStops
 
     def getExtensions(self, genome, genes):
+        self._logger.info("Method call: getExtensions")
         """
         genome: The genome as a string.
         genes:  A list of Iteration objects.
@@ -83,6 +91,7 @@ class Extend():
         return results
 
     def writeExtensions(self, genome, extensions, name):
+        self._logger.info("Method call: writeExtensions")
         """
         genome: The genome as a string.
         extensions: A dictionary mapping genes(Iteration objects) to alternative locations where that gene could start.
@@ -93,7 +102,7 @@ class Extend():
         try:
             output = open(name + ".extensions.fas", "w")
         except FileNotFoundError as e:
-            print(e)
+            self._logger.exception("Could not open " + name + ".extensions.fas" + str(e))
             raise Exceptions.ExtendError
 
         q = 0
@@ -119,6 +128,7 @@ class Extend():
         output.close()
 
     def applyExtensions(self, genome, genes, extendedGenes):
+        self._logger.info("Method call: applyExtensions")
         """
         genome:        The genome as a string.
         genes:         A dictionary that maps query names to Iteration objects
@@ -138,6 +148,7 @@ class Extend():
         reverseStops.append(len(genome))
 
         def reduceFunction(gene, x, y):
+        self._logger.info("Method call: reduceFunction")
             if re.sub(r"(~\d+)~\d+", r"\1", y.query) == gene.query:
                 if gene.location[0] < gene.location[1]:
                     stop = max(filter(lambda z: z < gene.location[1], forwardStops))
@@ -163,6 +174,7 @@ class Extend():
         return result
 
     def extendGenes(self, query, genes, name, blast, database, eValue, result_path, pipeline):
+        self._logger.info("Method call: extendGenes")
         """
         query:    File name of the query.
         ganes:    A dictionary that maps query names to Iteration objects

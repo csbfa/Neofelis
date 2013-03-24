@@ -2,15 +2,22 @@
 """
 from Library import Utils, Exceptions
 import re, os, subprocess
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Genemark")
 
 class Genemark():
 
     def __init__(self, path):
+        self._logger.info("Method call: Genemark.__init__")
         if not os.path.isdir(path + "/initialBlasts"):
             os.mkdir(path + "/initialBlasts")
         self.path = path + "/initialBlasts"
 
     def modifyFastaHeader(self, fileName, name):
+        self._logger.info("Method call: modifyFastaHeader")
         """
         fileName: The name of the file to modify.
         name:     The name of the genome that will be included in the header of each sequence
@@ -19,7 +26,7 @@ class Genemark():
         try:
             input = open(fileName, "r")
         except FileNotFoundError as e:
-            print(e)
+            self._logger.exception("Could not open " + filename + str(e))
             raise Exceptions.GenemarkError
 
         swap = ""
@@ -34,13 +41,14 @@ class Genemark():
         try:
             output = open(fileName, "w")
         except FileNotFoundError as e:
-            print(e)
+            self._logger.exception("Could not open " + filename + str(e))
             raise Exceptions.GenemarkError
 
         output.write(swap)
         output.close()
 
     def removeInvalidGenes(self, fileName, genomeLength):
+        self._logger.info("Method call: removeInvalidGenes")
         """
         fileName:     Name of the file to modify.
         genomeLength: Length of the genome that the sequences in fileName came from
@@ -55,14 +63,14 @@ class Genemark():
                 temp = open(fileName, "w+")
                 temp.close()
             except FileNotFoundError as e:
-                print(e, ": Failed to create file\n")
+                self._logger.exception("Failed to create temp file" + str(e))
                 raise Exceptions.GenemarkError
 
         try:
             input = open(fileName, "r")
             swap, reading = "", True
         except FileNotFoundError as e:
-            print(e)
+            self._logger.exception("Could not open " + filename + str(e))
             raise Exceptions.GenemarkError
 
         for line in input:
@@ -80,6 +88,7 @@ class Genemark():
         output.close()
 
     def findGenes(self, query, name, blastLocation, database, eValue, genemark, matrix, result_path, pipeline):
+        self._logger.info("Method call: findGenes")
         """
         query:         File name of the query.
         name:          Name of the genome in the query.
@@ -137,6 +146,7 @@ class Genemark():
             self.modifyFastaHeader(query + ".orf", name)
 
         except Exceptions.GenemarkError:
+            self._logger.exception("Encountered a Genemark error")
             raise Exceptions.GenemarkError
 
         try:
@@ -157,6 +167,5 @@ class Genemark():
             return result
 
         except Exceptions.GenemarkError:
-            print("cachedBlast failed.")
+            self._logger.exception("cachedBlast failed.")
             raise Exceptions.GenemarkError
-

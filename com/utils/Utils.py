@@ -5,6 +5,10 @@
 import os, sys, re, datetime, subprocess, functools, multiprocessing, fileinput
 import xml.sax as xmls
 from Library import Exceptions
+import com.log.Log as Log
+
+self._logger = Log.new()
+self._logger.info("Logging started in Utils")
 
 #Start and stop codons
 startCodons = ("ATG", "GTG", "TTG")
@@ -37,6 +41,7 @@ translationDictionary = {"TTT":"F","TTC":"F",
                          "GGA":"G", "GGT":"G", "GGG":"G", "GGC":"G"}
 
 def ShortOptions(self, k):
+    self._logger.info("Method call: ShortOptions")
     """
 
     """
@@ -81,6 +86,7 @@ def ShortOptions(self, k):
 # __ShortOptions__
 
 def FileIO(self, input_file=None, input_dir=None, output_file=None, output_dir=None):
+    self._logger.info("Method call: FileIO")
     """
 
     """
@@ -168,6 +174,7 @@ def FileIO(self, input_file=None, input_dir=None, output_file=None, output_dir=N
 # __FileIO__
 
 def Prompt(params):
+    self._logger.info("Method call: Prompt")
     """
 
     """
@@ -323,6 +330,7 @@ def Prompt(params):
 # __Prompt__
 
 def Parse(self, params):
+    self._logger.info("Method call: Parse")
     """
 
     """
@@ -331,6 +339,7 @@ def Parse(self, params):
 # __Parse__
 
 def Save(self, params):
+    self._logger.info("Method call: Save")
     """
 
     """
@@ -340,6 +349,7 @@ def Save(self, params):
 # __Save__
 
 def loadGenome(fileName):
+    self._logger.info("Method call: loadGenome")
     """
     Loads the genome from a fasta file containing a single genome.
     """
@@ -359,6 +369,7 @@ def loadGenome(fileName):
 # __loadGenome__
 
 def isGenome(fileName):
+    self._logger.info("Method call: isGenome")
     """
     Returns true if the file represented by fileName is a fasta file containing one genome.
     """
@@ -386,6 +397,7 @@ def isGenome(fileName):
 # __isGenome__
 
 def translate(input):
+    self._logger.info("Method call: translate")
     """
     Returns a Neucleotide sequence translated into Proteins.
     """
@@ -397,6 +409,7 @@ def translate(input):
 # __translate__
 
 def reverseComplement(input):
+    self._logger.info("Method call: reverseComplement")
     """
     Returns the reverse complement of a Neucleotide sequence.
     """
@@ -410,6 +423,7 @@ def reverseComplement(input):
 # __reverseComplement__
 
 def getHeader(self, fileName):
+    self._logger.info("Method call: getHeader")
     """
 
     """
@@ -427,6 +441,7 @@ def getHeader(self, fileName):
 # __getHeader__
 
 def getGeneLocations(self, genes):
+    self._logger.info("Method call: getGeneLocations")
     """
     Takes a a map with GeneStructs as values and returns a two Dictionaries.
     These Dictionies will contain as tuples the left and right ends of genes
@@ -452,6 +467,7 @@ class Iteration:
     """
 
     def __init__(self):
+    self._logger.info("Method call: Iteration.__init__")
         self.query =           None
         self.location =        []
         self.numHits =         0
@@ -467,6 +483,7 @@ class Iteration:
         self.intergenic =      False
 
     def __str__(self):
+    self._logger.info("Method call: Iteration.__str__")
         result = "<"
         result += "Query = " + str(self.query) + ", "
         result += "Location = " + str(self.location) + ", "
@@ -490,6 +507,7 @@ class Hit:
     """
 
     def __init__(self):
+    self._logger.info("Method call: Hit.__init__")
         self.eValue = float("inf")
         self.bitScore = 0
         self.identity = 0
@@ -499,6 +517,7 @@ class Hit:
         self.organism = None
 
     def __str__(self):
+    self._logger.info("Method call: Hit.__str__")
         result = "<"
         result += "BitScore = " + str(self.bitScore) + ", "
         result += "EValue = " + str(self.eValue) + ", "
@@ -518,6 +537,7 @@ class Hsp:
     """
 
     def __init__(self):
+    self._logger.info("Method call: Hsp.__init__")
         self.eValue = float("inf")
         self.bitScore = 0
         self.identity = 0
@@ -542,6 +562,7 @@ class BlastHandler(xmls.handler.ContentHandler):
     """
 
     def __init__(self):
+    self._logger.info("Method call: BlastHandler.__init__")
         self.iterations = []
         self.hits = []
         self.hsps = []
@@ -551,6 +572,7 @@ class BlastHandler(xmls.handler.ContentHandler):
         super(BlastHandler, self).__init__()
 
     def setDocumentLocator(self,locator):
+    self._logger.info("Method call: setDocumentLocator")
         """
 
         """
@@ -560,6 +582,7 @@ class BlastHandler(xmls.handler.ContentHandler):
     # __setDocumentLocator__
 
     def startElement(self, name, attributes):
+    self._logger.info("Method call: startElement")
         """
         Records the tag of the current node and generates a new
         object to store the information in the iteration,
@@ -576,6 +599,7 @@ class BlastHandler(xmls.handler.ContentHandler):
     # __startElement__
 
     def endElement(self, name):
+    self._logger.info("Method call: endElement")
         """
         Calculates the contents of a Hit structure once the end of a Hit node has been reached,
         and calculates the contents of a Iteration structure once the end of an Iteration node
@@ -623,6 +647,7 @@ class BlastHandler(xmls.handler.ContentHandler):
     # __endElement__
 
     def characters(self, data):
+    self._logger.info("Method call: characters")
         """
         Pulls the character information from the current node depending on the
         tag of the parent.
@@ -640,6 +665,7 @@ class BlastHandler(xmls.handler.ContentHandler):
     # __characters__
 
     def resolveEntity(self, publicId, systemId):
+    self._logger.info("Method call: resolveEntity")
         """
 
         """
@@ -651,6 +677,7 @@ class BlastHandler(xmls.handler.ContentHandler):
 # __BlastHandler__
 
 def parseBlast(self, fileName):
+    self._logger.info("Method call: parseBlast")
     """
     A function for parsing XML blast output.
     """
@@ -664,12 +691,13 @@ def parseBlast(self, fileName):
         itr = reader.getContentHandler().iterations
         return dict(map(lambda iteration: (iteration.query, iteration), itr))
     except Exception as e:
-        print("Exception: ", e)
+        self._logger.exception("Exception: " + str(e))
         raise ValueError
 
 # __parseBlast__
 
 def cachedBlast(fileName, blastLocation, database, eValue, query, pipeline, remote = False, force = False):
+    self._logger.info("Method call: cachedBlast")
     """
     Performs a blast search using the blastp executable and database in blastLocation on
     the query with the eValue.  The result is an XML file saved to fileName.  If fileName
@@ -686,7 +714,7 @@ def cachedBlast(fileName, blastLocation, database, eValue, query, pipeline, remo
             output = open(fileName, "w+")
             command = [blastLocation + "/bin/blastp", "-evalue", str(eValue), "-outfmt", "5", "-query", query]
         except FileNotFoundError as e:
-            print("\nFile not found: ", e)
+            self._logger.exception("\nFile not found: " str(e))
             raise Exceptions.GenemarkError
 
         if remote:
@@ -708,7 +736,7 @@ def cachedBlast(fileName, blastLocation, database, eValue, query, pipeline, remo
                 raise Exceptions.GenemarkError
 
         except Exception:
-            print("Exception in BLAST subprocess spawning")
+            self._logger.exception("Exception in BLAST subprocess spawning")
             raise Exceptions.GenemarkError
 
         while blastProcess.poll() is None:
@@ -733,12 +761,13 @@ def cachedBlast(fileName, blastLocation, database, eValue, query, pipeline, remo
     try:
         return parseBlast(pipeline, fileName)
     except xmls.SAXParseException as e:
-        print(e)
+        self._logger.exception("Unable to run xmls.SAXParseException" + str(e))
         raise Exceptions.GenemarkError
 
 # __cachedBlast__
 
 def getGCContent(genome):
+    self._logger.info("Method call: getGCContent")
     """
     A function for calculating the GC content of a genome.
     """
@@ -748,6 +777,7 @@ def getGCContent(genome):
 # __getGCContent__
 
 def isNaN(number):
+    self._logger.info("Method call: isNaN")
     """
     Returns true if number actually is a number.
     """
@@ -757,6 +787,7 @@ def isNaN(number):
 # __isNaN__
 
 def which(program):
+    self._logger.info("Method call: which")
     """
 
     """
@@ -764,6 +795,7 @@ def which(program):
     import os
 
     def is_exe(fpath):
+    self._logger.info("Method call: is_exe")
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
     fpath, fname = os.path.split(program)

@@ -4,10 +4,16 @@ Function for finding significant RNA sequences.
 
 import os,re,subprocess
 from Library import Exceptions
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Terminators")
 
 class tRNA():
 
     def __init__(self, path):
+        self._logger.info("Method call: tRNA.__init__")
         if not os.path.isdir(path + "/tRNAscan-SE"):
             os.mkdir(path + "/tRNAscan-SE")
         self.path = path + "/tRNAscan-SE"
@@ -18,9 +24,11 @@ class tRNA():
         """
 
         def __init__(self, start, stop, type, antiCodon, coveScore):
+            self._logger.info("Method call: TransferRNA.__init__")
             self.location, self.type, self.antiCodon, self.coveScore = [start, stop], type, antiCodon, coveScore
 
     def findtRNAs(self, tRNAscanLocation, query, name, pipeline):
+        self._logger.info("Method call: findtRNAs")
 
         """
         tRNAscanLocation: Directory that tRNAscan resides in.
@@ -46,7 +54,7 @@ class tRNA():
                 raise Exceptions.tRNAError
 
         except Exception:
-            print("Exception in tRNAscan-SE subprocess spawning")
+            self._logger.exception("Exception in tRNAscan-SE subprocess spawning")
             raise Exceptions.tRNAError
 
         while tRNAscanProcess.poll() is None:

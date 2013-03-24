@@ -3,13 +3,20 @@ Module for cleaning excess signals.
 """
 
 import copy
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Signals")
 
 class Signals():
 
     def __init__(self):
+        self._logger.info("Method call: Signals.__init__")
         pass
 
     def removeSignals(self, genes, signals):
+        self._logger.info("Method call: removeSignals")
         """
         genes:   List of Iteration objects.
         signals: List of signals(any object with a location tuple) to filter
@@ -36,6 +43,7 @@ class Signals():
         return remainingSignals
 
     def filterSignals(self, genes, signals, pipeline):
+        self._logger.info("Method call: filterSignals")
         """
         genes:   List of Iteration objects.
         signals: List of signals(any object with a location tuple) to filter

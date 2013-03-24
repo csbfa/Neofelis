@@ -3,10 +3,16 @@
 
 import os, functools
 from Library import Utils
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Intergenic")
 
 class Intergenic():
 
     def __init__(self, path):
+        self._logger.info("Method call: Intergenic.__init__")
         if not os.path.isdir(path + "/intergenicBlasts"):
             os.mkdir(path + "/intergenicBlasts")
         self.path = path + "/intergenicBlasts"
@@ -18,12 +24,14 @@ class Intergenic():
         """
 
         def __init__(self, startGene, start, stop, stopGene):
+            self._logger.info("Method call: Region.__init__")
             self.startGene = startGene
             self.start = start
             self.stop = stop
             self.stopGene = stopGene
 
         def __str__(self):
+            self._logger.info("Method call: Region.__str__")
             result = ">"
             result += "StartGene = " + str(self.startGene) + ", "
             result += "Start = " + str(self.start) + ", "
@@ -32,6 +40,7 @@ class Intergenic():
             return result
   
     def calculateIntergenicRegions(self, genomeLength, genes, minLength = 3):
+        self._logger.info("Method call: calculateIntergenicRegions")
         """
         genomeLength: Length of the genome.
         genes:        A list of Iteration objects representing genes.
@@ -47,6 +56,7 @@ class Intergenic():
         """
 
         def filterFunction(region):
+        self._logger.info("Method call: filterFunction")
             """
             Function for filtering regions which are smaller than minLength, that is, regions which are too small to contain
             an intergenic gene.
@@ -89,6 +99,7 @@ class Intergenic():
         return forwardResult, reverseResult
 
     def findPotentialGenes(self, genome, regions, minLength = 3):
+        self._logger.info("Method call: findPotentialGenes")
         """
         genome:    The genome as a string.
         region:    A list of intergenic regions.
@@ -129,6 +140,7 @@ class Intergenic():
         return potentials
                     
     def writePotentialGenes(self, genome, locations, name):
+        self._logger.info("Method call: writePotentialGenes")
         """
         genome:    The genome as a string.
         locations: A list of 2-tuples representing the locations of genes in string coordinates(first nucleotide is at zero and the ending index is exclusive).
@@ -153,6 +165,7 @@ class Intergenic():
         output.close()
 
     def removeCommonStops(slef, genes):
+        self._logger.info("Method call: removeCommonStops")
         """
         genes: A list of Iteration objects representing genes.
   
@@ -170,6 +183,7 @@ class Intergenic():
                 stopDictionary[gene.location[1]] = [gene]
 
         def reduceFunction(x, y):
+            self._logger.info("Method call: reduceFunction")
             """
             Function for determining the more favorable gene.  If both genes have
             infinite e values(no blast hits) then the difference of the e values is NaN
@@ -190,6 +204,7 @@ class Intergenic():
         return result
 
     def findIntergenics(self, query, genes, name, minLength, blast, database, eValue, result_path, pipeline):
+        self._logger.info("Method call: findIntergenics")
         """
         query:     File name of the fasta file.
         genes:     A dictionary that maps query names to Iteration objects

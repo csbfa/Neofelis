@@ -8,6 +8,11 @@ import Library.Event as event
 from threading import ThreadError
 from Library.Progress import *
 from Library.Utils import *
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Pipeline")
 
 class NeofelisPipeline():
     """
@@ -15,6 +20,7 @@ class NeofelisPipeline():
     """
 
     def __init__(self):
+        self._logger.info("Method call: NeofelisPipeline.__init__")
 
         self._sentinel = None
         self._pool = []
@@ -26,6 +32,7 @@ class NeofelisPipeline():
         self._threadstat = {}
 
     def status(self, threadName):
+        self._logger.info("Method call: status")
         """
         Return an instance of threadstat
         """
@@ -33,6 +40,7 @@ class NeofelisPipeline():
         return self._threadstat[threadName]
 
     def updateStatus(self, threadName, progress):
+        self._logger.info("Method call: updateStatus")
         """
 
         """
@@ -41,6 +49,7 @@ class NeofelisPipeline():
         self._is_updated = True
 
     def removeStatus(self, threadName):
+        self._logger.info("Method call: removeStatus")
         """
 
         """
@@ -49,6 +58,7 @@ class NeofelisPipeline():
         self._is_updated = True
 
     def getCompleted(self):
+        self._logger.info("Method call: getCompleted")
         """
 
         """
@@ -56,6 +66,7 @@ class NeofelisPipeline():
         return self._completed
 
     def incrementCompleted(self):
+        self._logger.info("Method call: incrementCompleted")
         """
 
         """
@@ -64,6 +75,7 @@ class NeofelisPipeline():
         self._is_updated = True
 
     def getFailed(self):
+        self._logger.info("Method call: getFailed")
         """
 
         """
@@ -71,6 +83,7 @@ class NeofelisPipeline():
         return self._failed
 
     def incrementFailed(self):
+        self._logger.info("Method call: incrementFailed")
         """
 
         """
@@ -78,6 +91,7 @@ class NeofelisPipeline():
         self._failed += 1
 
     def size(self):
+        self._logger.info("Method call: size")
         """
         Return size of thread pool
         """
@@ -85,6 +99,7 @@ class NeofelisPipeline():
         return len(self._pool)
 
     def pool(self):
+        self._logger.info("Method call: pool")
         """
         Return an instance of the thread pool
         """
@@ -92,6 +107,7 @@ class NeofelisPipeline():
         return self._pool
 
     def push(self, thread):
+        self._logger.info("Method call: push")
         """
         Push a thread into the thread pool
         """
@@ -99,6 +115,7 @@ class NeofelisPipeline():
         self._pool.append(thread)
 
     def remove(self, thread):
+        self._logger.info("Method call: remove")
         """
         Remove thread from thread pool
         """
@@ -106,9 +123,11 @@ class NeofelisPipeline():
         try:
             self._pool.remove(thread)
         except ValueError:
+            self._logger.warning("Warning: Could not remove a thread from the pool")
             pass
 
     def is_active(self):
+        self._logger.info("Method call: is_active")
         """
         Return true if the thread pool contains elements, false otherwise
         """
@@ -116,6 +135,7 @@ class NeofelisPipeline():
         return len(self._pool) != 0
 
     def isUpdated(self):
+        self._logger.info("Method call: isUpdated")
         """
         Return the event status of the pipeline. To be replaced by a more mature notify system
         """
@@ -123,6 +143,7 @@ class NeofelisPipeline():
         return self._is_updated
 
     def reset(self):
+        self._logger.info("Method call: reset")
         """
 
         """
@@ -130,6 +151,7 @@ class NeofelisPipeline():
         self._is_updated = False
 
     def panic(self):
+        self._logger.info("Method call: panic")
         """
 
         """
@@ -147,11 +169,13 @@ class NeofelisPipeline():
                 try:
                     self._sentinel.join()
                 except Exception:
+                    self._logger.warning("Warning: Could not join the sentinel thread")
                     pass
 
             print("Shutdown complete\n")
 
     def run(self, params):
+        self._logger.info("Method call: run")
         """"
 
         """
@@ -206,9 +230,10 @@ class NeofelisPipeline():
                 try:
                     self._sentinel.join()
                 except Exception:
+                    self._logger.warning("Warning: Could not join the sentinel thread")
                     pass
         except ThreadError:
-            print("Thread Error: Monitor thread failed")
+            self._logger.exception("Thread Error: Monitor thread failed")
             sys.exit(2)
 
 # __NeofelisPipeline__

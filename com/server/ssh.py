@@ -1,14 +1,18 @@
-
-
 import os
 import tempfile
 from paramiko import *
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for ssh")
 
 class Connection(object):
     """Connects and logs into the specified hostname.
     Arguments that are not given are guessed from the environment."""
 
     def __init__(self, host, username = None, private_key = None, password = None, port = 22 ):
+        self._logger.info("Method call: Connection.__init__")
         self._sftp_live = False
         self._sftp = None
         if not username:
@@ -41,12 +45,14 @@ class Connection(object):
             self._transport.connect(username = username, pkey = rsa_key)
 
     def _sftp_connect(self):
+        self._logger.info("Method call: Connection._sftp_connect")
         """Establish the SFTP connection."""
         if not self._sftp_live:
             self._sftp = SFTPClient.from_transport(self._transport)
             self._sftp_live = True
 
     def get(self, remotepath, localpath = None):
+        self._logger.info("Method call: get")
         """Copies a file between the remote host and the local host."""
         if not localpath:
             localpath = os.path.split(remotepath)[1]
@@ -54,6 +60,7 @@ class Connection(object):
         self._sftp.get(remotepath, localpath)
 
     def put(self, localpath, remotepath = None):
+        self._logger.info("Method call: put")
         """Copies a file between the local host and the remote host."""
         if not remotepath:
             remotepath = os.path.split(localpath)[1]
@@ -61,6 +68,7 @@ class Connection(object):
         self._sftp.put(localpath, remotepath)
 
     def execute(self, command):
+        self._logger.info("Method call: execute")
         """Execute the given commands on a remote machine."""
         channel = self._transport.open_session()
         channel.exec_command(command)
@@ -71,6 +79,7 @@ class Connection(object):
             return channel.makefile_stderr('rb', -1).readlines()
 
     def close(self):
+        self._logger.info("Method call: close")
         """Closes the connection and cleans up."""
         # Close SFTP Connection.
         if self._sftp_live:
@@ -82,6 +91,7 @@ class Connection(object):
             self._tranport_live = False
 
     def __del__(self):
+        self._logger.info("Method call: Connection.__del__")
         """Attempt to clean up if not explicitly closed."""
         self.close()
 

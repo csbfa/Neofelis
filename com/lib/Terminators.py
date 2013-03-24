@@ -3,10 +3,16 @@
 
 import subprocess, re, os
 from Library import Exceptions
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Terminators")
 
 class Terminators():
 
     def __init__(self):
+        self._logger.info("Method call: Terminators.__init__")
         pass
 
     class Terminator():
@@ -15,12 +21,14 @@ class Terminators():
         """
 
         def __init__(self):
+            self._logger.info("Method call: Terminator.__init__")
             self.location = None
             self.confidence = None
             self.hpScore = None
             self.tailScore = None
 
     def writeCoords(self, fileName, name, genes):
+        self._logger.info("Method call: writeCoords")
         """
         name:  Name of the genome.
         ganes: List of Iteration objects.
@@ -34,6 +42,7 @@ class Terminators():
         output.close()
 
     def parseTransterm(self, input):
+        self._logger.info("Method call: parseTransterm")
         """
         input:  Contents of a transterm file.
 
@@ -43,6 +52,7 @@ class Terminators():
         matches = re.findall(r"\s+TERM\s+\d+\s+(\d+)\s+-\s+(\d+)\s+[+-]\s+\S+\s+(\d+)\s+(-?\d+.?\d+)\s+(-?\d+.?\d+)", input)
 
         def buildTerminator(pieces):
+            self._logger.info("Method call: buildTerminator")
             """
             Turns a list of strings into a Terminator object.
             """
@@ -57,6 +67,7 @@ class Terminators():
         return list(map(buildTerminator, matches))
 
     def findTerminators(self, query, name, genes, transterm, pipeline):
+            self._logger.info("Method call: findTerminators")
         """
         query:     File name of the query.
         name:      Name of the genome.
@@ -85,7 +96,7 @@ class Terminators():
                 raise Exceptions.TerminatorsError
 
         except Exception:
-            print("Exception in Transterm subprocess spawning")
+            self._logger.exception("Exception in Transterm subprocess spawning")
             raise Exceptions.TerminatorsError
   
         while transtermProcess.poll() is None:

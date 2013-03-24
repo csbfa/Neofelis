@@ -1,5 +1,10 @@
 import smtplib
 import email.mime.text as email
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for class Event")
 
 class Event:
     """
@@ -7,6 +12,7 @@ class Event:
     """
 
     def __init__(self, email = None, smtpUser = None, smtpPassword = None, smtpServer = None):
+        self._logger.info("Method call: __init__")
         self._observers = []
         self._notify = False
         self._email = email
@@ -15,6 +21,7 @@ class Event:
         self._smtpServer = smtpServer
 
     def subscribe(self, observer):
+        self._logger.info("Method call: subscribe")
         """
 
         """
@@ -23,6 +30,7 @@ class Event:
             self._observers.append(observer)
 
     def unsubscribe(self, observer):
+        self._logger.info("Method call: unsubscribe")
         """
 
         """
@@ -30,9 +38,11 @@ class Event:
         try:
             self._observers.remove(observer)
         except ValueError:
+            self._logger.warning("Warning: attempted to unsubscribe an observer that didn't exist")
             pass
 
     def fire(self, subject, modifier=None, message="progress"):
+        self._logger.info("Method call: fire")
         """
 
         """
@@ -51,6 +61,7 @@ class Event:
                     return
 
     def update(self, subject, observer):
+        self._logger.info("Method call: update")
         """
         Update subject thread status in threadstat
         """
@@ -62,6 +73,7 @@ class Event:
             subject.lock.release()
 
     def failed(self, subject, observer):
+        self._logger.info("Method call: failed")
         """
 
         """
@@ -74,6 +86,7 @@ class Event:
             subject.lock.release()
 
     def completed(self, subject, observer):
+        self._logger.info("Method call: completed")
         """
 
         """
@@ -100,18 +113,18 @@ class Event:
             subject.lock.release()
 
     def acquire(self):
+        self._logger.info("Method call: acquire")
         self._notify = False
 
     def notify(self):
+        self._logger.info("Method call: notify")
         self._notify = True
 
     def wait(self):
+        self._logger.info("Method call: wait")
         while not self._notify:
             continue
 
         return
 
 # __Event__
-
-
-

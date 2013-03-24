@@ -1,6 +1,10 @@
-
 import re
 import sys
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Progress")
 
 class ProgressBar:
 	"""
@@ -20,6 +24,7 @@ class ProgressBar:
 			  " hours, %d minutes, %d seconds\n\tCompleted %d\n\tFailed %d"
 
 	def __init__(self, term, quantities):
+		self._logger.info("Method Call: ProgressBar.__init__")
 		self.term = term
 		if not (self.term.CLEAR_EOL and self.term.UP and self.term.BOL):
 			raise ValueError("Terminal cannot support formatted progress. Using simple progress")
@@ -31,6 +36,7 @@ class ProgressBar:
 		self.cleared = 1  # : true if we haven't drawn the bar yet.
 
 	def __print__(self, hours, minutes, seconds, completed, failed):
+		self._logger.info("Method Call: ProgressBar.__print__")
 		if self.cleared:
 			sys.stdout.write(str(self.term.BOL, 'ascii') + str(self.term.CLEAR_EOL, 'ascii') + self.header % 
 							  (self.quantities, hours, minutes, seconds, completed, failed) + str(self.term.CLEAR_EOL, 'ascii'))
@@ -38,6 +44,7 @@ class ProgressBar:
 			sys.stdout.write("\n\n")
 
 	def __update__(self, percent, message):
+		self._logger.info("Method Call: ProgressBar.__update__")
 		self.percent = float(percent) * 0.1
 		n = int((self.width - 10) * self.percent)
 		sys.stdout.write(str(self.term.BOL, 'ascii') + str(self.term.CLEAR_EOL, 'ascii') + message + "\n" + 
@@ -46,6 +53,7 @@ class ProgressBar:
 		sys.stdout.write("\n\n")
 
 	def __clear__(self):
+		self._logger.info("Method Call: ProgressBar.__clear__")
 		if not self.cleared:
 			sys.stdout.buffer.write(self.term.BOL)
 			sys.stdout.buffer.write(self.term.CLEAR_EOL)
@@ -133,6 +141,7 @@ class TerminalController:
 	_ANSICOLORS = "BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE".split()
 
 	def __init__(self, term_stream=sys.stdout):
+		self._logger.info("Method call: TerminalController.__init__")
 		"""
 		Create a `TerminalController` and initialize its attributes
 		with appropriate values for the current terminal.
@@ -144,6 +153,7 @@ class TerminalController:
 		# Curses isn't available on all platforms
 		try: import curses
 		except Exception as e: 
+			self._logger.warning("Warning: Curses unavailable on this platform")
 			raise e
 		
 		# If the stream isn't a tty, then assume it has no capabilities.
@@ -154,6 +164,7 @@ class TerminalController:
 		# terminal has no capabilities.
 		try: curses.setupterm()
 		except Exception as e: 
+			self._logger.warning("Warning: Could not start up a terminal")
 			raise e
 
 		# Look up numeric capabilities.
@@ -196,6 +207,7 @@ class TerminalController:
 		"""
 
 	def _tigetstr(self, cap_name):
+		self._logger.info("Method call: TerminalController._tigetstr")
 
 		# String capabilities can include "delays" of the form "$<2>".
 		# For any modern terminal, we should be able to just ignore
@@ -210,6 +222,7 @@ class TerminalController:
 		return regex.sub('', cap)
 
 	def render(self, template):
+		self._logger.info("Method call: render")
 		"""
 		Replace each $-substitutions in the given template string with
 		the corresponding terminal control string (if it's defined) or
@@ -220,6 +233,7 @@ class TerminalController:
 		return result
 
 	def _render_sub(self, m):
+		self._logger.info("Method call: TerminalController._render_sub")
 		s = list(m.group())
 		s = "".join(s)
 		if s == '$$': return s

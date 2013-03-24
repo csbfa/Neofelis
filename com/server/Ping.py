@@ -82,6 +82,11 @@ import struct
 import select
 import random
 import asyncore
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Ping")
      
 # From /usr/include/linux/icmp.h; your milage may vary.
 ICMP_ECHO_REQUEST = 8 # Seems to be the same on Solaris.
@@ -99,6 +104,7 @@ __all__ = ['create_packet', 'do_one', 'verbose_ping', 'PingQuery',
      
      
 def checksum(source_string):
+    self._logger.info("Method call: checksum")
     # I'm not too confident that this is right but testing seems to
     # suggest that it gives the same answers as in_cksum in ping.c.
     sum = 0
@@ -122,6 +128,7 @@ def checksum(source_string):
      
      
 def create_packet(id):
+    self._logger.info("Method call: create_packet")
     """Create a new echo request packet based on the given "id"."""
     # Header is type (8), code (8), checksum (16), id (16), sequence (16)
     header = struct.pack('bbHHh', ICMP_ECHO_REQUEST, 0, 0, id, 1)
@@ -136,6 +143,7 @@ def create_packet(id):
      
      
 def do_one(dest_addr, timeout=1):
+    self._logger.info("Method call: do_one")
     """
     Sends one ping to the given "dest_addr" which can be an ip or hostname.
     "timeout" can be any integer or float except negatives and zero.
@@ -147,6 +155,7 @@ def do_one(dest_addr, timeout=1):
     try:
         my_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, ICMP_CODE)
     except socket.error as errno:
+        self._logger.warning("Warning: Could not create a socket")
         if errno in ERROR_DESCR:
             # Operation not permitted
             raise socket.error(ERROR_DESCR)
@@ -154,7 +163,8 @@ def do_one(dest_addr, timeout=1):
     try:
             host = socket.gethostbyname(dest_addr)
     except socket.gaierror:
-            return
+        self._logger.exception("Could not get host by name")
+        return
     # Maximum for an unsigned short int c object counts to 65535 so
     # we have to sure that our packet id is not greater than that.
     packet_id = int((id(timeout) * random.random()) % 65535)
@@ -170,6 +180,7 @@ def do_one(dest_addr, timeout=1):
      
      
 def receive_ping(my_socket, packet_id, time_sent, timeout):
+    self._logger.info("Method call: receive_ping")
     # Receive the ping from the socket.
     time_left = timeout
     while True:
@@ -191,6 +202,7 @@ def receive_ping(my_socket, packet_id, time_sent, timeout):
      
      
 def verbose_ping(dest_addr, timeout=2, count=4):
+    self._logger.info("Method call: verbose_ping")
     """
     Sends one ping to the given "dest_addr" which can be an ip or hostname.
        
@@ -213,6 +225,7 @@ def verbose_ping(dest_addr, timeout=2, count=4):
      
 class PingQuery(asyncore.dispatcher):
     def __init__(self, host, p_id, timeout=0.5, ignore_errors=False):
+        self._logger.info("Method call: PingQuery.__init__")
         """
         Derived class from "asyncore.dispatcher" for sending and
         receiving an icmp echo request/reply.
@@ -236,6 +249,7 @@ class PingQuery(asyncore.dispatcher):
         try:
             self.create_socket(socket.AF_INET, socket.SOCK_RAW, ICMP_CODE)
         except socket.error as errno:
+            self._logger.warning("Warning: Could not create a socket")
             if errno in ERROR_DESCR:
                 # Operation not permitted
                 raise socket.error(ERROR_DESCR[errno])
@@ -254,9 +268,11 @@ class PingQuery(asyncore.dispatcher):
             self.handle_expt = self.do_not_handle_errors
        
     def writable(self):
+        self._logger.info("Method call: writable")
         return self.time_sent == 0
        
     def handle_write(self):
+        self._logger.info("Method call: handle_write")
         self.time_sent = time.time()
         while self.packet:
             # The icmp protocol does not use a port, but the function
@@ -265,6 +281,7 @@ class PingQuery(asyncore.dispatcher):
             self.packet = self.packet[sent:]
        
     def readable(self):
+        self._logger.info("Method call: readable")
         # As long as we did not sent anything, the channel has to be left open.
         if (not self.writable()
             # Once we sent something, we should periodically check if the reply
@@ -277,6 +294,7 @@ class PingQuery(asyncore.dispatcher):
         return not self.writable()
        
     def handle_read(self):
+        self._logger.info("Method call: handle_read")
         read_time = time.time()
         packet, addr = self.recvfrom(1024)
         header = packet[20:28]
@@ -288,19 +306,23 @@ class PingQuery(asyncore.dispatcher):
             self.close()
        
     def get_result(self):
+        self._logger.info("Method call: get_result")
         """Return the ping delay if possible, otherwise None."""
         if self.time_received > 0:
             return self.time_received - self.time_sent
        
     def get_host(self):
+        self._logger.info("Method call: get_host")
         """Return the host where to the request has or should been sent."""
         return self.host
        
     def do_not_handle_errors(self):
+        self._logger.info("Method call: do_not_handle_errors")
         # Just a dummy handler to stop traceback printing, if desired.
         pass
        
     def create_socket(self, family, type, proto):
+        self._logger.info("Method call: create_socket")
         # Overwritten, because the original does not support the "proto" arg.
         sock = socket.socket(family, type, proto)
         sock.setblocking(0)
@@ -312,16 +334,20 @@ class PingQuery(asyncore.dispatcher):
     # If the following methods would not be there, we would see some very
     # "useful" warnings from asyncore, maybe. But we do not want to, or do we?
     def handle_connect(self):
+        self._logger.info("Method call: handle_connect")
         pass
        
     def handle_accept(self):
+        self._logger.info("Method call: handle_accept")
         pass
        
     def handle_close(self):
+        self._logger.info("Method call: handle_close")
         self.close()
      
      
 def multi_ping_query(hosts, timeout=1, step=512, ignore_errors=False):
+    self._logger.info("Method call: multi_ping_query")
     """
     Sends multiple icmp echo requests at once.
        
@@ -337,6 +363,7 @@ def multi_ping_query(hosts, timeout=1, step=512, ignore_errors=False):
         try:
             host_list.append(socket.gethostbyname(host))
         except socket.gaierror:
+            self._logger.warning("Warning: Could not append the host's socket to the list")
             results[host] = None
     while host_list:
         sock_list = []

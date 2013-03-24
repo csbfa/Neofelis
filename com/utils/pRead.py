@@ -1,20 +1,25 @@
-
 import subprocess
 import select
 import fcntl
 import os
 import errno
 from Library import Log, Exceptions
+import com.log.Log as Log
 
+
+self._logger = Log.new()
+self._logger.info("Logging started in pRead")
 
 class pRead():
 
     def __init__(self, name):
+        self._logger.info("Method call: __init__")
         self._log = Log
         self._logger = self._log.new(name)
         self._name = name
 
     def make_async(self, fd):
+        self._logger.info("Method call: make_async")
         """
         Add the O_NONBLOCK flag to a file descriptor
         """
@@ -22,6 +27,7 @@ class pRead():
         fcntl.fcntl(fd, fcntl.F_SETFL, fcntl.fcntl(fd, fcntl.F_GETFL) | os.O_NONBLOCK)
 
     def read_async(self, fd):
+        self._logger.info("Method call: read_async")
         """
         Read some data from a file descriptor, ignoring EAGAIN errors
         """
@@ -29,18 +35,21 @@ class pRead():
         try:
             return fd.read()
         except IOError as e:
+            self._logger.exception("Could not read async")
             if e.errno != errno.EAGAIN:
                 raise e
             else:
                 return ''
 
     def log_fds(self, fds):
+        self._logger.info("Method call: log_fds")
         for fd in fds:
             out = self.read_async(fd)
             if out:
                 self._logger.info(out)
 
     def pread(self, command, pipeline):
+        self._logger.info("Method call: pread")
         """
             @params command - formatted command string for subprocess
                     pipeline - instance of thread
@@ -61,6 +70,7 @@ class pRead():
                 try:
                     self._proc.kill()
                 except Exception as e:
+                    self._logger.exception("Internal Error: exception when killing subprocess\n\n" + str(e))
                     raise Exceptions.pReadError("Internal Error: exception when killing subprocess:\n\n" + str(e))
                 return
 
@@ -72,6 +82,7 @@ class pRead():
                 else:
                     rlist, wlist, xlist = select.select([self._proc.stderr], [], [])
             except Exception as e:
+                self._logger.exception("Internal Error occurred in select.select:\n\n" + str(e))
                 raise Exceptions.pReadError("Internal Error occurred in select.select:\n\n" + str(e))
 
             self.log_fds(rlist)
@@ -86,6 +97,7 @@ class pRead():
                     else:
                         self.log_fds([self._proc.stderr])
                 except Exception as e:
+                    self._logger.exception("Internal Error occurred in select.select:\n\n" + str(e))
                     raise Exceptions.pReadError("Internal Error occurred in select.select:\n\n" + str(e))
 
                 break

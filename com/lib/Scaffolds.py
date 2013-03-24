@@ -6,6 +6,11 @@ of genes and removing conflicting genes.
 
 import copy, functools
 from Library import Exceptions
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Scaffolds")
 
 class Scaffolds():
 
@@ -16,11 +21,13 @@ class Scaffolds():
         """
 
         def __init__(self, start, stop, genes):
+            self._logger.info("Method call: Scaffold.__init__")
             self.start = start
             self.stop = stop
             self.genes = genes
         
         def __str__(self):
+            self._logger.info("Method call: Scaffold.__str__")
             result = "<"
             result += "start = " + str(self.start) + ", "
             result += "stop = " + str(self.stop) + ", "
@@ -28,6 +35,7 @@ class Scaffolds():
             return result
 
     def extractScaffolds(self, genes, scaffoldingDistance = 100):
+        self._logger.info("Method call: extractScaffolds")
         """
         genes:               A list of Iteration objects.
         scaffoldingDistance: Maximum distance between neighboring genes in a scaffold.
@@ -76,6 +84,7 @@ class Scaffolds():
         return forwardScaffolds, reverseScaffolds
 
     def overlap(self, intervalOne, intervalTwo):
+        self._logger.info("Method call: overlap")
         """
         intervalOne: A 2-tuple of integers.
         intervalTwo: A 2-tuple of integers.
@@ -95,6 +104,7 @@ class Scaffolds():
             return -1
     
     def filterScaffolds(self, originalForwardScaffolds, originalReverseScaffolds):
+        self._logger.info("Method call: filterScaffolds")
         """
         originalForwardScaffolds: List of Scaffold objects for the forward genes.
         originalReverseScaffolds: List of Scaffold objects for the reverse genes.
@@ -188,6 +198,7 @@ class Scaffolds():
         return newForwardScaffolds, newReverseScaffolds
 
     def refineScaffolds(self, genes, scaffoldingDistance, pipeline):
+        self._logger.info("Method call: refineScaffolds")
         """
         genes:               A dictionary that maps query names to Iteration objects.
         scaffoldingDistance: Maximum distance between neighboring genes in a scaffold.

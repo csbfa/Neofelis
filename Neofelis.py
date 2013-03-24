@@ -1,4 +1,3 @@
-
 import sys, getopt, re, os, socket, signal, logging, pickle
 import com.pipeline.Pipeline as Pipeline
 import com.view.View as View
@@ -7,6 +6,10 @@ import com.exceptions as Exceptions
 import com.utils.Utils as Utils
 import com.log.Log as Log
 import com.post.Progress as Progress
+
+
+self._logger = Log.new()
+self._logger.info("Logging started with level %s", str(self._params("log")).upper())
 
 
 class Neofelis():
@@ -94,6 +97,7 @@ class Neofelis():
     """
 
     def __init__(self):
+        self._logger.info("Method call: __init__")
         pass
 
     usage = "python Neofelis.py [prefix: -|--] [h|help] [m|man] [i|interface=] [x:|matrix=] [d:|database] [g:|genemark=] " \
@@ -108,6 +112,7 @@ class Neofelis():
               'critical': logging.CRITICAL}
 
     def start_server(self, params, view):
+        self._logger.info("Method call: start_server")
         """
         Method: start_server ( dict, NeofelisView ):
             Attempts to start a new Neofelis server at the address specified in option 'server', listening on port
@@ -154,6 +159,7 @@ class Neofelis():
     # start_server
 
     def client(self, params, client, user, passwd, address, port):
+        self._logger.info("Method call: client")
         """
         Method: Client ( dict, string, string, string, string, string ):
             Given the client address, client user, client password, Neofelis server address, and Neofelis port,
@@ -168,7 +174,8 @@ class Neofelis():
             self._data = pickle.dumps(params)
             self._socket.sendall(self._data)
         except socket.error:
-            print("Socket Error: Failure to send parameters to server\n\tat Neofelis.new(), line 93")
+            #print("Socket Error: Failure to send parameters to server\n\tat Neofelis.new(), line 93")
+            self._logger.error("Socket Error: Failure to send parameters to server\n\tat Neofelis.new()")
         finally:
             self._receive = self._socket.recv(4096)
             if not self._receive:
@@ -178,7 +185,8 @@ class Neofelis():
         try:
             self._socket.sendall(client)
         except socket.error:
-            print("Socket Error: Failure to send client location to server\n\tat Neofelis.new(), line 103")
+            #print("Socket Error: Failure to send client location to server\n\tat Neofelis.new(), line 103")
+            self._logger.error("Socket Error: Failure to send client location to server\n\tat Neofelis.new()")
         finally:
             self._receive = self._socket.recv(4096)
             if not self._receive:
@@ -188,7 +196,7 @@ class Neofelis():
         try:
             self._socket.sendall(user)
         except socket.error:
-            print("Socket Error: Failure to send client location to server\n\tat Neofelis.new(), line 103")
+            self._logger.error("Socket Error: Failure to send client location to server\n\tat Neofelis.new()")
         finally:
             self._receive = self._socket.recv(4096)
             if not self._receive:
@@ -198,7 +206,7 @@ class Neofelis():
         try:
             self._socket.sendall(passwd)
         except socket.error:
-            print("Socket Error: Failure to send client location to server\n\tat Neofelis.new(), line 103")
+            self._logger.error("Socket Error: Failure to send client location to server\n\tat Neofelis.new()")
         finally:
             self._receive = self._socket.recv(4096)
             if not self._receive:
@@ -210,6 +218,7 @@ class Neofelis():
     # client
 
     def test(self, address):
+        self._logger.info("Method call: test")
         """
         Method: test ( string ):
             Pings the address. Returns true if the server is alive, false otherwise.
@@ -217,6 +226,7 @@ class Neofelis():
         try:
             Ping.verbose_ping(address)
         except socket.error:
+            self._logger.error("Error: Unable to ping the target server")
             return False
         finally:
             return True
@@ -224,6 +234,7 @@ class Neofelis():
     # test
 
     def to_string(self):
+        self._logger.info("Method call: to_string")
         """
         Method: to_string ():
             Return full POSIX documentation formatted to string
@@ -233,6 +244,7 @@ class Neofelis():
     # toString
 
     def signal_handler(self, signal, frame):
+        self._logger.info("Method call: signal_handler")
         print("Keyboard Interupt caught\n")
         if self.pipe is not None:
             self.pipe.panic()
@@ -302,6 +314,7 @@ class Neofelis():
             except getopt.GetoptError as err:
                 print(err)
                 print(Neofelis.usage)
+                self._logger.warning("Warning: User entered bad or poorly formatted inputs")
                 return -1
 
             if opts is None or len(opts) == 0:
@@ -366,15 +379,6 @@ class Neofelis():
             sys.stdout.write(header)
             sys.stdout.write(content)
 
-        # start logging
-        try:
-            self._log = Log()
-            self._log.start(self.LEVELS.get(str(self._params("log")).lower(), logging.ERROR))
-        except Exceptions.LoggingException:
-            return -1
-
-        self._logger = self._log.new(__name__)
-        self._logger.info("Logging started with level %s", str(self._params("log")).upper())
 
         # different than default action - input parameters AND GUI allowed
         if re.match(r'gui', self._params["interface"], re.IGNORECASE):
@@ -395,7 +399,7 @@ class Neofelis():
                 # send filled out params to server in View
 
             except Exceptions.GraphicsException:
-                print("PyQT is not enabled for your environment")
+                self._logger.warning("PyQT is not enabled for your environment")
 
         else:
 

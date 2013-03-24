@@ -7,13 +7,20 @@ from xml.sax.handler import ContentHandler
 from xml.sax.handler import EntityResolver
 import xml.sax as xmls
 from Library import Exceptions
+import com.log.Log as Log
+
+
+self._logger = Log.new()
+self._logger.info("Logging started for Report")
 
 class Report():
 
     def __init__(self):
+        self._logger.info("Method call: Report.__init__")
         self.xmlDictionary = {"&" : "&amp;", "\"" : "&quot;"}
 
     def handleXMLCharacters(self, input):
+        self._logger.info("Method call: handleXMLCharacters")
         """
         Turns special characters into their xml form.
         """
@@ -31,6 +38,7 @@ class Report():
         """
 
         def __init__(self, output, instance):
+            self._logger.info("Method call: HTMLWriter.__init__")
             self.output = output
             self.htmlDepth = 0
             self.querySequence = self.hitSequence = self.midline = self.tag = ""
@@ -39,32 +47,40 @@ class Report():
             super().__init__()
 
         def setDocumentLocator(self,locator):
+            self._logger.info("Method call: setDocumentLocator")
             self.locator = locator
 
         def writeHTMLStartTag(self, tag):
+            self._logger.info("Method call: writeHTMLStartTag")
             self.output.write("  " * self.htmlDepth + "<" + tag + ">\n")
             self.htmlDepth += 1
 
         def writeHTMLEndTag(self, tag):
+            self._logger.info("Method call: writeHTMLEndTag")
             self.htmlDepth -= 1
             self.output.write("  "*self.htmlDepth + "</" + tag + ">\n")
 
         def writeHTMLParagraph(self, text):
+            self._logger.info("Method call: writeHTMLParagraph")
             self.output.write("  "*self.htmlDepth + "<p>" + text + "</p>\n")
 
         def writeHTMLLine(self, text):
+            self._logger.info("Method call: writeHTMLLine")
             self.output.write("  "*self.htmlDepth + text + "\n")
 
         def writeHTMLDefinitionItem(self, text):
+            self._logger.info("Method call: writeHTMLDefinitionItem")
             self.output.write("  "*self.htmlDepth + "<dt>" + text + "</dt>\n")
 
         def startDocument(self):
+            self._logger.info("Method call: startDocument")
             print ( "html start document")
             self.output = open(self.output, "w")
             self.writeHTMLStartTag("html")
             self.writeHTMLStartTag("body  style=\"font-family:monospace;white-space:nowrap;\"")
 
         def endDocument(self):
+            self._logger.info("Method call: endDocument")
             print ( "html end document")
             self.writeHTMLEndTag("html")
             self.writeHTMLEndTag("body")
@@ -72,6 +88,7 @@ class Report():
             self.output.close()
 
         def startElement(self, tag, attributes):
+            self._logger.info("Method call: startElement")
 
             print ( "html start element: ", tag)
             self.text, self.tag = "", tag
@@ -89,6 +106,7 @@ class Report():
                 self.writeHTMLStartTag("dd")
 
         def endElement(self, tag):
+            self._logger.info("Method call: endElement")
 
             print ( "html end element: ", tag)
             if tag == "BlastOutput_iterations":
@@ -137,6 +155,7 @@ class Report():
                 self.writeHTMLEndTag("p")
 
         def characters(self, data):
+            self._logger.info("Method call: characters")
 
             self.line = self.locator.getLineNumber()
 
@@ -150,6 +169,7 @@ class Report():
                 self.working_line = self.line
 
         def resolveEntity(self, publicId, systemId):
+            self._logger.info("Method call: resolveEntity")
 
             print("html resolveEntity: ", publicId, ", ", systemId)
 
@@ -181,6 +201,7 @@ class Report():
         """
 
         def __init__(self, sources, genes, output, instance, printing = False, parent = None, iteration = 1):
+            self._logger.info("Method call: BlastMerger.__init__")
             self.sources = sources
             self.output = output
             self.genes = genes
@@ -198,9 +219,11 @@ class Report():
             super().__init__()
 
         def setDocumentLocator(self,locator):
+            self._logger.info("Method call: setDocumentLocator")
             self.locator = locator
 
         def startDocument(self):
+            self._logger.info("Method call: startDocument")
             """
             If output is a string then nothing has been written, so it needs to be made into a file object
             and a header needs to be written.
@@ -214,11 +237,13 @@ class Report():
                 self.output.write("<!DOCTYPE BlastOutput PUBLIC \"-//NCBI//NCBI BlastOutput/EN\" \"NCBI_BlastOutput.dtd\">\n")
 
         def endDocument(self):
+            self._logger.info("Method call: endDocument")
             print ( "end document")
             self.output.write("\n")
             self.output.close()
 
         def startElement(self, tag, attributes):
+            self._logger.info("Method call: startElement")
 
             print("start tag: ", tag)
 
@@ -236,6 +261,7 @@ class Report():
                 self.whitespace = []
 
         def endElement(self, tag):
+            self._logger.info("Method call: endElement")
 
             print("end tag: ", tag)
 
@@ -249,7 +275,9 @@ class Report():
                     try:
                         reader.parse(self.sources[0])
                     except self.instance.BreakParsingException:
+                        self._logger.warning("Unable to parse self.sources[0]")
                         if self.parent:
+                            self._logger.exception("Parent not found when unable to parse self.sources[0]")
                             raise self.instance.BreakParsingException()
                         else:
                             pass
@@ -280,6 +308,7 @@ class Report():
                 self.printing = True
 
         def characters(self, data):
+            self._logger.info("Method call: characters")
 
             print("characters: ", data)
 
@@ -312,9 +341,11 @@ class Report():
                     self.output.write(self.instance.handleXMLCharacters(str(data)))
 
         def ignorableWhitespace(self, raw):
+            self._logger.info("Method call: ignorableWhitespace")
             self.whitespace += raw.tostring()
 
         def resolveEntity(self, publicId, systemId):
+            self._logger.info("Method call: resolveEntity")
 
             print("resolveEntity: ", publicId, ", ", systemId)
 
@@ -334,6 +365,7 @@ class Report():
         pass
 
     def writeSpreadsheet(self, genes, output):
+        self._logger.info("Method call: writeSpreadsheet")
         """
         genes:  A list of Iteration objects.
         output: File name to write iterations to.
@@ -364,13 +396,14 @@ class Report():
                 output.write(gene.title + "\t")
                 output.write(gene.organism + "\n")
         except Exception as e:
-            print("Exception occurred in xls writing: ",  e)
+            self._logger.exception("Exception occurred in xls writing: " + str(e))
             output.close()
             raise Exceptions.ReportError()
 
         output.close()
 
     def report(self, name, genes, output, pipeline):
+        self._logger.info("Method call: report")
         """
         name:   Name of the genome.
         genes:  A dictionary that maps query names to Iteration objects.
